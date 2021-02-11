@@ -32,6 +32,18 @@ public class Endereco {
         this.estado = estado;
     }
 
+    public String getCep() { return cep; }
+
+    public String getLogradouro() { return logradouro; }
+
+    public Integer getNumero() { return numero; }
+
+    public String getBairro() { return bairro; }
+
+    public String getCidade() { return cidade; }
+
+    public String getEstado() { return estado; }
+
     @Override
     public String toString() {
         return "Endereco{" +

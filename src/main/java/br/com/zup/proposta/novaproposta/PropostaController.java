@@ -1,29 +1,29 @@
 package br.com.zup.proposta.novaproposta;
 
 import br.com.zup.proposta.config.handler.ErrosResponse;
-import br.com.zup.proposta.feign.AnaliseCliente;
 import feign.FeignException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/propostas")
 public class PropostaController {
 
     private PropostaRepository propostaRepository;
-    private AnaliseCliente analiseCliente;
+    private PropostaService propostaService;
+    private Proposta propostaSalva;
 
-    public PropostaController(PropostaRepository propostaRepository, AnaliseCliente analiseCliente) {
+    public PropostaController(PropostaRepository propostaRepository, PropostaService propostaService) {
         this.propostaRepository = propostaRepository;
-        this.analiseCliente = analiseCliente;
+        this.propostaService = propostaService;
     }
 
     @PostMapping
@@ -36,20 +36,33 @@ public class PropostaController {
         Proposta proposta = request.toModel();
         propostaRepository.save(proposta);
 
-        try {
-            AnaliseCliente.ConsultaStatusRequest analiseRequest = new AnaliseCliente.ConsultaStatusRequest(proposta.getDocumento(),
-                    proposta.getNome(), proposta.getId());
-            AnaliseCliente.ConsultaAnaliseResponse analiseResponse = analiseCliente.consulta(analiseRequest);
-
-            proposta.atualizaStatus(analiseResponse.getResultadoSolicitacao());
-        } catch (FeignException.UnprocessableEntity e) {
-            proposta.atualizaStatus("COM_RESTRICAO");
-        }
+        proposta = propostaService.analisaCliente(proposta);
 
         propostaRepository.save(proposta);
 
+        this.propostaSalva = proposta;
+
         URI location = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
         return ResponseEntity.created(location).body(proposta.toString());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DetalhesPropostaResponse> detalhar(@PathVariable("id") Long id) {
+        Optional<Proposta> proposta = propostaRepository.findById(id);
+        if(proposta.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(new DetalhesPropostaResponse(proposta.get()));
+    }
+
+    @Async
+    @Scheduled(fixedDelayString = "${periodicidade.associa-cartao}")
+    public void associaCartao() {
+        if(propostaSalva != null) {
+            propostaService.associaCartao(propostaSalva, propostaRepository);
+            propostaSalva = null;
+        }
     }
 
 }

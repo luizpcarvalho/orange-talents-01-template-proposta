@@ -25,6 +25,7 @@ public class Proposta {
     private BigDecimal salario;
     @Enumerated(EnumType.STRING)
     private Status status;
+    private String cartao;
 
     @Deprecated
     public Proposta() {
@@ -46,9 +47,19 @@ public class Proposta {
         return documento;
     }
 
+    public String getEmail() { return email; }
+
     public String getNome() {
         return nome;
     }
+
+    public Endereco getEndereco() { return endereco; }
+
+    public BigDecimal getSalario() { return salario; }
+
+    public Status getStatus() { return status; }
+
+    public String getCartao() { return cartao; }
 
     @Override
     public String toString() {
@@ -66,4 +77,6 @@ public class Proposta {
     public void atualizaStatus(String solicitacao) {
         this.status = Status.resultadoPara(solicitacao);
     }
+
+    public void cadastraCartao(String cartao) { this.cartao = cartao; }
 }
