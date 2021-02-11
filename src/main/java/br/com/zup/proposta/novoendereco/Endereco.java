@@ -1,17 +1,11 @@
 package br.com.zup.proposta.novoendereco;
 
-import br.com.zup.proposta.novaproposta.Proposta;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 
-import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
-
-@Entity
+@Embeddable
 public class Endereco {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Column(nullable = false)
     private String cep;
     @Column(nullable = false)
@@ -24,28 +18,23 @@ public class Endereco {
     private String cidade;
     @Column(nullable = false)
     private String estado;
-    @OneToMany(mappedBy = "endereco", cascade = CascadeType.PERSIST)
-    private Set<Proposta> propostas = new HashSet<>();
 
     @Deprecated
     public Endereco() {
     }
 
-    public Endereco(String cep, String logradouro, Integer numero, String bairro,
-                    String cidade, String estado, Proposta proposta) {
+    public Endereco(String cep, String logradouro, Integer numero, String bairro, String cidade, String estado) {
         this.cep = cep;
         this.logradouro = logradouro;
         this.numero = numero;
         this.bairro = bairro;
         this.cidade = cidade;
         this.estado = estado;
-        this.propostas.add(proposta);
     }
 
     @Override
     public String toString() {
         return "Endereco{" +
-                "id=" + id +
                 ", cep='" + cep + '\'' +
                 ", logradouro='" + logradouro + '\'' +
                 ", numero=" + numero +

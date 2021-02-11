@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "propostas")
 public class Proposta {
 
     @Id
@@ -18,16 +19,22 @@ public class Proposta {
     private String email;
     @Column(nullable = false)
     private String nome;
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @Embedded
     private Endereco endereco;
     @Column(nullable = false)
     private BigDecimal salario;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Deprecated
+    public Proposta() {
+    }
 
     public Proposta(String documento, String email, String nome, NovoEnderecoRequest endereco, BigDecimal salario) {
         this.documento = documento;
         this.email = email;
         this.nome = nome;
-        this.endereco = endereco.toModel(this);
+        this.endereco = endereco.toModel();
         this.salario = salario;
     }
 
@@ -35,8 +42,12 @@ public class Proposta {
         return id;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public String getDocumento() {
+        return documento;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     @Override
@@ -48,6 +59,11 @@ public class Proposta {
                 ", nome='" + nome + '\'' +
                 ", endereco=" + endereco +
                 ", salario=" + salario +
+                ", status=" + status +
                 '}';
+    }
+
+    public void atualizaStatus(String solicitacao) {
+        this.status = Status.resultadoPara(solicitacao);
     }
 }

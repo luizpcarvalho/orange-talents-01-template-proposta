@@ -22,6 +22,7 @@ public class ErrosHandler {
     public ResponseEntity<List<ErrosResponse>> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         List<FieldError> erros = e.getBindingResult().getFieldErrors();
         List<ErrosResponse> response = new ArrayList<>();
+
         erros.forEach(erro -> {
             String mensagem = messageSource.getMessage(erro, LocaleContextHolder.getLocale());
             response.add(new ErrosResponse(erro.getField(), mensagem));

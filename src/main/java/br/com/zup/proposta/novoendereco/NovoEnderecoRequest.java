@@ -1,7 +1,5 @@
 package br.com.zup.proposta.novoendereco;
 
-import br.com.zup.proposta.novaproposta.Proposta;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -42,7 +40,7 @@ public class NovoEnderecoRequest {
         return estado;
     }
 
-    public Endereco toModel(Proposta proposta) {
-        return new Endereco(this.cep, this.logradouro, this.numero, this.bairro, this.cidade, this.estado, proposta);
+    public Endereco toModel() {
+        return new Endereco(this.cep, this.logradouro, this.numero, this.bairro, this.cidade, this.estado);
     }
 }
