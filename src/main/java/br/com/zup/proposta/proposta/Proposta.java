@@ -1,10 +1,12 @@
-package br.com.zup.proposta.novaproposta;
+package br.com.zup.proposta.proposta;
 
-import br.com.zup.proposta.novoendereco.Endereco;
-import br.com.zup.proposta.novoendereco.NovoEnderecoRequest;
+import br.com.zup.proposta.proposta.cartao.Cartao;
+import br.com.zup.proposta.proposta.endereco.Endereco;
+import br.com.zup.proposta.proposta.endereco.NovoEnderecoRequest;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "propostas")
@@ -24,8 +26,12 @@ public class Proposta {
     @Column(nullable = false)
     private BigDecimal salario;
     @Enumerated(EnumType.STRING)
-    private Status status;
-    private String cartao;
+    private StatusProposta status;
+    @Column(nullable = false)
+    private LocalDateTime instanteCriacao;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(referencedColumnName = "id")
+    private Cartao cartao;
 
     @Deprecated
     public Proposta() {
@@ -37,6 +43,7 @@ public class Proposta {
         this.nome = nome;
         this.endereco = endereco.toModel();
         this.salario = salario;
+        this.instanteCriacao = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -57,9 +64,9 @@ public class Proposta {
 
     public BigDecimal getSalario() { return salario; }
 
-    public Status getStatus() { return status; }
+    public StatusProposta getStatus() { return status; }
 
-    public String getCartao() { return cartao; }
+    public Cartao getCartao() { return cartao; }
 
     @Override
     public String toString() {
@@ -75,8 +82,11 @@ public class Proposta {
     }
 
     public void atualizaStatus(String solicitacao) {
-        this.status = Status.resultadoPara(solicitacao);
+        this.status = StatusProposta.resultadoPara(solicitacao);
     }
 
-    public void cadastraCartao(String cartao) { this.cartao = cartao; }
+    public void cadastraCartao(Cartao cartao) {
+        this.cartao = cartao;
+        this.status = StatusProposta.ELEGIVEL_COM_CARTAO;
+    }
 }

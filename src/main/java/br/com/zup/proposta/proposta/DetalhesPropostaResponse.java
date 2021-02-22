@@ -1,6 +1,7 @@
-package br.com.zup.proposta.novaproposta;
+package br.com.zup.proposta.proposta;
 
-import br.com.zup.proposta.novoendereco.Endereco;
+import br.com.zup.proposta.proposta.cartao.CartaoResponse;
+import br.com.zup.proposta.proposta.endereco.Endereco;
 
 public class DetalhesPropostaResponse {
 
@@ -9,8 +10,8 @@ public class DetalhesPropostaResponse {
     private String email;
     private String nome;
     private Endereco endereco;
-    private Status status;
-    private String cartao;
+    private StatusProposta statusProposta;
+    private CartaoResponse cartao;
 
     public DetalhesPropostaResponse(Proposta proposta) {
         this.id = proposta.getId();
@@ -18,8 +19,8 @@ public class DetalhesPropostaResponse {
         this.email = proposta.getEmail();
         this.nome = proposta.getNome();
         this.endereco = proposta.getEndereco();
-        this.status = proposta.getStatus();
-        this.cartao = proposta.getCartao();
+        this.statusProposta = proposta.getStatus();
+        this.cartao = new CartaoResponse(proposta.getCartao());
     }
 
     public Long getId() {
@@ -42,11 +43,11 @@ public class DetalhesPropostaResponse {
         return endereco;
     }
 
-    public Status getStatus() {
-        return status;
+    public StatusProposta getStatus() {
+        return statusProposta;
     }
 
-    public String getCartao() {
+    public CartaoResponse getCartao() {
         return cartao;
     }
 }

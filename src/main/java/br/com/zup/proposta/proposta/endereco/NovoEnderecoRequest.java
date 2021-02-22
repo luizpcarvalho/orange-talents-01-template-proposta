@@ -1,4 +1,4 @@
-package br.com.zup.proposta.novoendereco;
+package br.com.zup.proposta.proposta.endereco;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

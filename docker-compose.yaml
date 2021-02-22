@@ -134,7 +134,31 @@ services:
       VAULT_TOKEN: ee413645-dbe8-4848-afc6-6bb2768ada75
       VAULT_ADDR: http://127.0.0.1:8200
 
+  proposta:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: zupacademy/proposta
+    ports:
+      - 8081:8081
+    environment:
+      HOST_CONTAS: contas:8888
+      HOST_ANALISE: analise:9999
+      DB_HOST: postgres
+      PROPOSTA_DATABASE_USERNAME: keycloak
+      PROPOSTA_DATABASE_PASSWORD: password
+      KEYCLOAK_HOST: keycloak:8080
+      NOME_DA_APLICACAO: servico de propostas
+      AMBIENTE: desenvolvimento
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+    depends_on:
+      - postgres
+
 volumes:
   grafana-volume:
   prometheus-volume:
   postgres-volume:
+
+networks:
+  default:
+    name: proposta_default

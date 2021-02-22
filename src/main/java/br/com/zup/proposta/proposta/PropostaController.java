@@ -1,10 +1,8 @@
-package br.com.zup.proposta.novaproposta;
+package br.com.zup.proposta.proposta;
 
 import br.com.zup.proposta.config.handler.ErrosResponse;
-import feign.FeignException;
+import br.com.zup.proposta.proposta.util.Encryptor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,11 +17,12 @@ public class PropostaController {
 
     private PropostaRepository propostaRepository;
     private PropostaService propostaService;
-    private Proposta propostaSalva;
+    private Encryptor encryptor;
 
-    public PropostaController(PropostaRepository propostaRepository, PropostaService propostaService) {
+    public PropostaController(PropostaRepository propostaRepository, PropostaService propostaService, Encryptor encryptor) {
         this.propostaRepository = propostaRepository;
         this.propostaService = propostaService;
+        this.encryptor = encryptor;
     }
 
     @PostMapping
@@ -33,14 +32,12 @@ public class PropostaController {
             return ResponseEntity.unprocessableEntity().body(new ErrosResponse("documento",
                     "O solicitante já realizou a proposta."));
         }
-        Proposta proposta = request.toModel();
+        encryptor.init();
+        Proposta proposta = request.toModel(encryptor);
         propostaRepository.save(proposta);
 
-        proposta = propostaService.analisaCliente(proposta);
-
+        proposta = propostaService.analisaCliente(proposta, encryptor);
         propostaRepository.save(proposta);
-
-        this.propostaSalva = proposta;
 
         URI location = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
         return ResponseEntity.created(location).body(proposta.toString());
@@ -54,15 +51,6 @@ public class PropostaController {
         }
 
         return ResponseEntity.ok().body(new DetalhesPropostaResponse(proposta.get()));
-    }
-
-    @Async
-    @Scheduled(fixedDelayString = "${periodicidade.associa-cartao}")
-    public void associaCartao() {
-        if(propostaSalva != null) {
-            propostaService.associaCartao(propostaSalva, propostaRepository);
-            propostaSalva = null;
-        }
     }
 
 }

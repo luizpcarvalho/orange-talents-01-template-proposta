@@ -1,4 +1,4 @@
-package br.com.zup.proposta.novoendereco;
+package br.com.zup.proposta.proposta.endereco;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;

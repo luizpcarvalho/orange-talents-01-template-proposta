@@ -20,6 +20,7 @@ public class HealthCheckIndicator implements HealthIndicator {
             return Health.up().build();
         }
         return Health.down().build();
+
     }
 
     boolean check() {

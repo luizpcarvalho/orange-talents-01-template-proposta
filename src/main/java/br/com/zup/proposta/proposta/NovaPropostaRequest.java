@@ -1,8 +1,10 @@
-package br.com.zup.proposta.novaproposta;
+package br.com.zup.proposta.proposta;
 
 import br.com.zup.proposta.config.validacao.CPFOuCNPJ;
-import br.com.zup.proposta.novoendereco.NovoEnderecoRequest;
+import br.com.zup.proposta.proposta.endereco.NovoEnderecoRequest;
+import br.com.zup.proposta.proposta.util.Encryptor;
 
+import javax.crypto.SecretKey;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -47,7 +49,8 @@ public class NovaPropostaRequest {
         return salario;
     }
 
-    public Proposta toModel() {
-        return new Proposta(this.documento, this.email, this.nome, this.endereco, this.salario);
+    public Proposta toModel(Encryptor encryptor) {
+        String documentoEcriptado = encryptor.encrypt(this.documento);
+        return new Proposta(documentoEcriptado, this.email, this.nome, this.endereco, this.salario);
     }
 }
