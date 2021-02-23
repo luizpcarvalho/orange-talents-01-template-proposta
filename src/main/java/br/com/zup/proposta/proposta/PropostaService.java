@@ -12,12 +12,10 @@ public class PropostaService {
 
     public PropostaService(AnaliseCliente analiseCliente) {
         this.analiseCliente = analiseCliente;
-
     }
 
-    public Proposta analisaCliente(Proposta proposta, Encryptor encryptor) {
-        String documento = encryptor.decrypt(proposta.getDocumento());
-        AnaliseCliente.ConsultaStatusRequest analiseRequest = new AnaliseCliente.ConsultaStatusRequest(documento,
+    public Proposta analisaCliente(Proposta proposta) {
+        AnaliseCliente.ConsultaStatusRequest analiseRequest = new AnaliseCliente.ConsultaStatusRequest(proposta.getDocumento(),
                 proposta.getNome(), proposta.getId());
 
         try {

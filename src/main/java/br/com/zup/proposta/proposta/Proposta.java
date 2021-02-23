@@ -3,6 +3,8 @@ package br.com.zup.proposta.proposta;
 import br.com.zup.proposta.proposta.cartao.Cartao;
 import br.com.zup.proposta.proposta.endereco.Endereco;
 import br.com.zup.proposta.proposta.endereco.NovoEnderecoRequest;
+import br.com.zup.proposta.proposta.util.Encryptor;
+import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,7 +17,8 @@ public class Proposta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @Convert(converter = Encryptor.class)
     private String documento;
     @Column(nullable = false)
     private String email;

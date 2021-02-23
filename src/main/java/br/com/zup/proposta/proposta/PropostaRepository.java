@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface PropostaRepository extends JpaRepository<Proposta, Long> {
-    boolean existsByDocumento(String documento);
+    Proposta findByDocumento(String documento);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE) // for update
     @QueryHints({

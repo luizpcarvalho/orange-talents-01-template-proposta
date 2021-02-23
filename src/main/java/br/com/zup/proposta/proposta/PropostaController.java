@@ -9,6 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,26 +18,27 @@ public class PropostaController {
 
     private PropostaRepository propostaRepository;
     private PropostaService propostaService;
-    private Encryptor encryptor;
 
-    public PropostaController(PropostaRepository propostaRepository, PropostaService propostaService, Encryptor encryptor) {
+    public PropostaController(PropostaRepository propostaRepository, PropostaService propostaService) {
         this.propostaRepository = propostaRepository;
         this.propostaService = propostaService;
-        this.encryptor = encryptor;
     }
 
     @PostMapping
     @Transactional
     public ResponseEntity<?> criar(@RequestBody @Valid NovaPropostaRequest request, UriComponentsBuilder uriBuilder) {
-        if(propostaRepository.existsByDocumento(request.getDocumento())){
-            return ResponseEntity.unprocessableEntity().body(new ErrosResponse("documento",
-                    "O solicitante já realizou a proposta."));
+        List<Proposta> list = propostaRepository.findAll();
+        for (Proposta proposta : list) {
+            if(proposta.getDocumento().equals(request.getDocumento())){
+                return ResponseEntity.unprocessableEntity().body(new ErrosResponse("documento",
+                        "O solicitante já realizou a proposta."));
+            }
         }
-        encryptor.init();
-        Proposta proposta = request.toModel(encryptor);
+
+        Proposta proposta = request.toModel();
         propostaRepository.save(proposta);
 
-        proposta = propostaService.analisaCliente(proposta, encryptor);
+        proposta = propostaService.analisaCliente(proposta);
         propostaRepository.save(proposta);
 
         URI location = uriBuilder.path("/propostas/{id}").buildAndExpand(proposta.getId()).toUri();
