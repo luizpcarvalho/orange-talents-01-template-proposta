@@ -4,6 +4,7 @@ import br.com.zup.proposta.proposta.cartao.Cartao;
 import br.com.zup.proposta.proposta.endereco.Endereco;
 import br.com.zup.proposta.proposta.endereco.NovoEnderecoRequest;
 import br.com.zup.proposta.proposta.util.Encryptor;
+import br.com.zup.proposta.proposta.util.EncryptorAttributeConverter;
 import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
@@ -18,7 +19,7 @@ public class Proposta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    @Convert(converter = Encryptor.class)
+    @Convert(converter = EncryptorAttributeConverter.class)
     private String documento;
     @Column(nullable = false)
     private String email;

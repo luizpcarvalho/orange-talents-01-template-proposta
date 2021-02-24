@@ -1,27 +1,42 @@
 package br.com.zup.proposta.proposta.util;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.AttributeConverter;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 
 @Component
-public class Encryptor implements AttributeConverter<String, String> {
+public class Encryptor {
 
+    private final String ALGORITHM = "AES/ECB/PKCS5Padding";
     @Value("${encryptor.secret.key}")
-    private String secret;
-    @Value("${encryptor.secret.salt}")
-    private String salt;
+    private String KEY;
 
-    @Override
-    public String convertToDatabaseColumn(String attribute) {
-        return Encryptors.text(secret, salt).encrypt(attribute);
+    public String encode(String value) {
+        Key key = new SecretKeySpec(KEY.getBytes(), "AES");
+        try {
+            final Cipher c = Cipher.getInstance(ALGORITHM);
+            c.init(Cipher.ENCRYPT_MODE, key);
+            final String encrypted = new String(Base64.encodeBase64(c.doFinal(value.getBytes())), "UTF-8");
+            return encrypted;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
-    public String convertToEntityAttribute(String dbData) {
-        return Encryptors.text(secret, salt).decrypt(dbData);
+    public String decode(String value) {
+        Key key = new SecretKeySpec(KEY.getBytes(), "AES");
+        try {
+            final Cipher c = Cipher.getInstance(ALGORITHM);
+            c.init(Cipher.DECRYPT_MODE, key);
+            final String decrypted = new String(c.doFinal(Base64.decodeBase64(value.getBytes("UTF-8"))));
+            return decrypted;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

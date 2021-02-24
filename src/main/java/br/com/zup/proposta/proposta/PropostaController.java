@@ -27,12 +27,9 @@ public class PropostaController {
     @PostMapping
     @Transactional
     public ResponseEntity<?> criar(@RequestBody @Valid NovaPropostaRequest request, UriComponentsBuilder uriBuilder) {
-        List<Proposta> list = propostaRepository.findAll();
-        for (Proposta proposta : list) {
-            if(proposta.getDocumento().equals(request.getDocumento())){
-                return ResponseEntity.unprocessableEntity().body(new ErrosResponse("documento",
-                        "O solicitante já realizou a proposta."));
-            }
+        if(propostaRepository.findByDocumento(request.getDocumento()).isPresent()){
+            return ResponseEntity.unprocessableEntity().body(new ErrosResponse("documento",
+                    "O solicitante já realizou a proposta."));
         }
 
         Proposta proposta = request.toModel();

@@ -9,10 +9,11 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.LockModeType;
 import javax.persistence.QueryHint;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PropostaRepository extends JpaRepository<Proposta, Long> {
-    Proposta findByDocumento(String documento);
+    Optional<Proposta> findByDocumento(String documento);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE) // for update
     @QueryHints({

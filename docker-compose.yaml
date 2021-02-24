@@ -110,10 +110,12 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-volume:/etc/prometheus/
-    network_mode: bridge
     ports:
       - "9090:9090"
+    environment:
+      PROMETHEUS_HOST: proposta:8081
 
   grafana:
     image: grafana/grafana
